@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'question.dart';
+import 'quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() => runApp(const Quizzler());
 
@@ -8,10 +9,10 @@ class Quizzler extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.grey.shade900,
-        body: const SafeArea(
+        backgroundColor: Color.fromARGB(255, 21, 21, 21),
+        body: SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0),
             child: QuizPage(),
@@ -32,15 +33,28 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   List<Widget> scoreKeeper = const [];
 
-  List<Question> questionBank = [
-    Question(q: 'You can lead a cow down stairs but not up stairs.', a: false),
-    Question(
-        q: 'Approximately one quarter of human bones are in the feet.',
-        a: true),
-    Question(q: 'A slug\'s blood is green.', a: true)
-  ];
+  QuizBrain quizBrain = QuizBrain();
 
   int questionNumber = 0;
+  //////////
+  void nextQuestion() {
+    if (questionNumber < quizBrain.questionBank.length - 1) {
+      questionNumber++;
+    }
+  }
+
+  bool isFinished() {
+    if (questionNumber >= quizBrain.questionBank.length - 1) {
+      print('Now returning true');
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void reset() {
+    questionNumber = 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +68,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: const EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                questionBank[questionNumber].questionText,
+                quizBrain.questionBank[questionNumber].questionText,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 25.0,
@@ -81,15 +95,28 @@ class _QuizPageState extends State<QuizPage> {
                 //The user picked true.
 
                 bool correctAnswer =
-                    questionBank[questionNumber].questionAnswer;
-                if (correctAnswer == true) {
-                  print('user got it right');
+                    quizBrain.questionBank[questionNumber].questionAnswer;
+
+                if (isFinished() == true) {
+                  Alert(
+                    context: context,
+                    title: 'Finished!',
+                    desc: 'You\'ve reached the end of the quiz.',
+                  ).show();
+
+                  reset();
+
+                  scoreKeeper = [];
                 } else {
-                  print('user got it wrong');
+                  if (correctAnswer == true) {
+                    print('user got it right');
+                  } else {
+                    print('user got it wrong');
+                  }
                 }
 
                 setState(() {
-                  questionNumber++;
+                  nextQuestion();
                 });
                 print(questionNumber);
               },
@@ -112,15 +139,28 @@ class _QuizPageState extends State<QuizPage> {
                 //The user picked false.
 
                 bool correctAnswer =
-                    questionBank[questionNumber].questionAnswer;
-                if (correctAnswer == false) {
-                  print('user got it right');
+                    quizBrain.questionBank[questionNumber].questionAnswer;
+
+                if (isFinished() == true) {
+                  Alert(
+                    context: context,
+                    title: 'Finished!',
+                    desc: 'You\'ve reached the end of the quiz.',
+                  ).show();
+
+                  reset();
+
+                  scoreKeeper = [];
                 } else {
-                  print('user got it wrong');
+                  if (correctAnswer == false) {
+                    print('user got it right');
+                  } else {
+                    print('user got it wrong');
+                  }
                 }
 
                 setState(() {
-                  questionNumber++;
+                  nextQuestion();
                 });
                 print(questionNumber);
               },
@@ -134,3 +174,12 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 }
+
+
+ // List<Question> questionBank = [
+  //   Question(q: 'You can lead a cow down stairs but not up stairs.', a: false),
+  //   Question(
+  //       q: 'Approximately one quarter of human bones are in the feet.',
+  //       a: true),
+  //   Question(q: 'A slug\'s blood is green.', a: true)
+  // ];
